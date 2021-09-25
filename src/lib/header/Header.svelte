@@ -23,17 +23,6 @@
 					</button>
 				</div>
 			</div>
-			<div class="flex-col hidden md:flex md:flex-row md:-mx-4">
-				<a href="/" class="nav-link">Home</a>
-				<a href="/" class="nav-link">Blog</a>
-				<a href="/" class="nav-link">About us</a>
-			</div>
 		</div>
 	</nav>
 </div>
-
-<style type="text/postcss">
-	.nav-link {
-		@apply my-1 text-gray-800 hover:text-blue-500 md:mx-4 md:my-0;
-	}
-</style>
