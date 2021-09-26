@@ -1,11 +1,12 @@
 <script context="module">
-	import { db } from '$modules/firebase/firebase';
-	import { doc, getDoc } from 'firebase/firestore';
+	import { db, firestorage } from '$modules/firebase/firebase';
+	import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
 	export async function load({ page }) {
 		const tuneDoc = await getDoc(doc(db, 'tunes', page.params.id));
 
 		return {
 			props: {
+				tuneId: page.params.id,
 				tune: tuneDoc.data()
 			}
 		};
@@ -15,9 +16,22 @@
 <script lang="ts">
 	import Button from '$lib/button/Button.svelte';
 	import type { Tune } from '$types/tune';
+	import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+	import dayjs from 'dayjs';
+	import { user } from '$modules/store/store';
+
 	export let tune: Tune;
+	export let tuneId;
 	let fileinput;
 	let previewUrl;
+	let ext;
+	let uid;
+
+	const getExtFromName = (name: string): string => {
+		let index = name.lastIndexOf('.');
+		return name.slice(index + 1);
+	};
+
 	const onFileSelected = (e) => {
 		let music = e.target.files[0];
 		let reader = new FileReader();
@@ -25,7 +39,29 @@
 		reader.onload = (e) => {
 			previewUrl = e.target.result;
 		};
+		const name = music.name;
+		ext = getExtFromName(name);
 	};
+
+	const getNowTime = () => {
+		const now = dayjs();
+		return now.format('YYYY_MM_DD_HH_mm_ss');
+	};
+
+	const upload = async () => {
+		const now = getNowTime();
+		const upRef = ref(firestorage, `/${uid}/tunes/${tuneId}/${now}.${ext}`);
+		const result = await uploadBytes(upRef, fileinput);
+		const url = await getDownloadURL(result.ref);
+		await addDoc(collection(db, 'tunes', tuneId, 'records'), {
+			uid,
+			src: url
+		});
+	};
+
+	user.subscribe((user) => {
+		uid = user.uid;
+	});
 </script>
 
 <svelte:head>
@@ -34,7 +70,7 @@
 
 <div class="min-w-md flex justify-center items-center self-center pt-20">
 	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-md">
-		<h1>ファイルアップロード</h1>
+		<h1>録音追加</h1>
 		<Button
 			on:click={() => {
 				fileinput.click();
@@ -53,5 +89,6 @@
 			Your browser does not support the
 			<code>audio</code> element.
 		</audio>
+		<Button on:click={upload}>アップロード</Button>
 	</div>
 </div>
