@@ -27,7 +27,7 @@
 	let previewUrl;
 	let ext;
 	let uid;
-	let records: Record[];
+	let records: Record[] = [];
 
 	const getExtFromName = (name: string): string => {
 		let index = name.lastIndexOf('.');
@@ -90,8 +90,8 @@
 	<title>{tune.name}</title>
 </svelte:head>
 
-<div class="min-w-md flex justify-center items-center self-center pt-20">
-	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-md">
+<div class="min-w-md justify-center items-center self-center pt-20">
+	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg mx-auto">
 		<h1>録音追加</h1>
 		<Button
 			on:click={() => {
@@ -113,7 +113,8 @@
 		</audio>
 		<Button on:click={upload}>アップロード</Button>
 	</div>
-	<div class="max-w-lg mx-auto bg-white rounded p-5">
+	<div class="max-w-lg mx-auto bg-white rounded p-5 mt-10">
+		<h1>録音</h1>
 		{#each records as record (record.id)}
 			<div>
 				<audio controls src={record.src}>
