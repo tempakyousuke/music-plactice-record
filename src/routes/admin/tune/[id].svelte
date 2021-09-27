@@ -1,9 +1,6 @@
 <script context="module">
-	import { db, firestorage } from '$modules/firebase/firebase';
-	import { doc, getDoc } from 'firebase/firestore';
 	export async function load({ page }) {
 		const tuneDoc = await getDoc(doc(db, 'tunes', page.params.id));
-
 		return {
 			props: {
 				tuneId: page.params.id,
@@ -14,12 +11,15 @@
 </script>
 
 <script lang="ts">
+	import { db, firestorage } from '$modules/firebase/firebase';
+	import { doc, getDoc, getDocs } from 'firebase/firestore';
 	import Button from '$lib/button/Button.svelte';
-	import type { Tune } from '$types/tune';
+	import type { Tune, Record } from '$types/tune';
 	import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import dayjs from 'dayjs';
 	import { user } from '$modules/store/store';
+	import { onMount } from 'svelte';
 
 	export let tune: Tune;
 	export let tuneId;
@@ -27,6 +27,7 @@
 	let previewUrl;
 	let ext;
 	let uid;
+	let records: Record[];
 
 	const getExtFromName = (name: string): string => {
 		let index = name.lastIndexOf('.');
@@ -60,10 +61,28 @@
 			created: serverTimestamp(),
 			modified: serverTimestamp()
 		});
+		getRecords(tuneId);
 	};
 
 	user.subscribe((user) => {
 		uid = user.uid;
+	});
+
+	const getRecords = async (id) => {
+		const snapshots = await getDocs(collection(db, 'tunes', id, 'records'));
+		const arr = [];
+		snapshots.forEach((snapshot) => {
+			const tune = {
+				id: snapshot.id,
+				...snapshot.data()
+			} as Tune;
+			arr.push(tune);
+		});
+		records = arr;
+	};
+
+	onMount(() => {
+		getRecords(tuneId);
 	});
 </script>
 
@@ -93,5 +112,15 @@
 			<code>audio</code> element.
 		</audio>
 		<Button on:click={upload}>アップロード</Button>
+	</div>
+	<div class="max-w-lg mx-auto bg-white rounded p-5">
+		{#each records as record (record.id)}
+			<div>
+				<audio controls src={record.src}>
+					Your browser does not support the
+					<code>audio</code> element.
+				</audio>
+			</div>
+		{/each}
 	</div>
 </div>

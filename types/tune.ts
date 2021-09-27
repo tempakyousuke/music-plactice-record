@@ -3,3 +3,8 @@ export type Tune = {
   name: string;
   sessionLink: string;
 }
+
+export type Record = {
+  id: string;
+  src: string;
+}
