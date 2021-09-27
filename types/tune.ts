@@ -7,4 +7,5 @@ export type Tune = {
 export type Record = {
   id: string;
   src: string;
+  path: string;
 }

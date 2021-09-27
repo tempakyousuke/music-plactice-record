@@ -28,6 +28,8 @@
 	let ext;
 	let uid;
 	let records: Record[] = [];
+	let selected = false;
+	let file;
 
 	const getExtFromName = (name: string): string => {
 		let index = name.lastIndexOf('.');
@@ -35,13 +37,14 @@
 	};
 
 	const onFileSelected = (e) => {
-		let music = e.target.files[0];
+		selected = true;
+		file = e.target.files[0];
 		let reader = new FileReader();
-		reader.readAsDataURL(music);
+		reader.readAsDataURL(file);
 		reader.onload = (e) => {
 			previewUrl = e.target.result;
 		};
-		const name = music.name;
+		const name = file.name;
 		ext = getExtFromName(name);
 	};
 
@@ -52,12 +55,12 @@
 
 	const upload = async () => {
 		const now = getNowTime();
+		const path = `/${uid}/tunes/${tuneId}/${now}.${ext}`;
 		const upRef = ref(firestorage, `/${uid}/tunes/${tuneId}/${now}.${ext}`);
-		const result = await uploadBytes(upRef, fileinput);
-		const url = await getDownloadURL(result.ref);
+		await uploadBytes(upRef, file);
 		await addDoc(collection(db, 'tunes', tuneId, 'records'), {
 			uid,
-			src: url,
+			path,
 			created: serverTimestamp(),
 			modified: serverTimestamp()
 		});
@@ -71,14 +74,19 @@
 	const getRecords = async (id) => {
 		const snapshots = await getDocs(collection(db, 'tunes', id, 'records'));
 		const arr = [];
-		snapshots.forEach((snapshot) => {
-			const tune = {
+		snapshots.forEach(async (snapshot) => {
+			const record = {
 				id: snapshot.id,
 				...snapshot.data()
-			} as Tune;
-			arr.push(tune);
+			} as Record;
+			arr.push(record);
 		});
-		records = arr;
+		records = await Promise.all(
+			arr.map(async (val) => {
+				val.src = await getDownloadURL(ref(firestorage, val.path));
+				return val;
+			})
+		);
 	};
 
 	onMount(() => {
@@ -111,7 +119,7 @@
 			Your browser does not support the
 			<code>audio</code> element.
 		</audio>
-		<Button on:click={upload}>アップロード</Button>
+		<Button on:click={upload} disabled={!selected}>アップロード</Button>
 	</div>
 	<div class="max-w-lg mx-auto bg-white rounded p-5 mt-10">
 		<h1>録音</h1>
@@ -121,6 +129,8 @@
 					Your browser does not support the
 					<code>audio</code> element.
 				</audio>
+				<!-- <Button on:click={() => play(record)}>再生</Button>
+				<Button on:click={stop}>停止</Button> -->
 			</div>
 		{/each}
 	</div>
