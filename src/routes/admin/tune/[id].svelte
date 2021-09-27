@@ -129,8 +129,6 @@
 					Your browser does not support the
 					<code>audio</code> element.
 				</audio>
-				<!-- <Button on:click={() => play(record)}>再生</Button>
-				<Button on:click={stop}>停止</Button> -->
 			</div>
 		{/each}
 	</div>
