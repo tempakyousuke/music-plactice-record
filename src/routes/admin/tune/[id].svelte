@@ -1,6 +1,6 @@
 <script context="module">
 	import { db, firestorage } from '$modules/firebase/firebase';
-	import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
+	import { doc, getDoc } from 'firebase/firestore';
 	export async function load({ page }) {
 		const tuneDoc = await getDoc(doc(db, 'tunes', page.params.id));
 
@@ -17,6 +17,7 @@
 	import Button from '$lib/button/Button.svelte';
 	import type { Tune } from '$types/tune';
 	import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import dayjs from 'dayjs';
 	import { user } from '$modules/store/store';
 
@@ -55,7 +56,9 @@
 		const url = await getDownloadURL(result.ref);
 		await addDoc(collection(db, 'tunes', tuneId, 'records'), {
 			uid,
-			src: url
+			src: url,
+			created: serverTimestamp(),
+			modified: serverTimestamp()
 		});
 	};
 

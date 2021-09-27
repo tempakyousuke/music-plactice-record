@@ -2,7 +2,7 @@
 	import Input from '$lib/forms/Input.svelte';
 	import Button from '$lib/button/Button.svelte';
 	import { db } from '$modules/firebase/firebase';
-	import { collection, addDoc } from 'firebase/firestore';
+	import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
 
 	let name = '';
@@ -13,7 +13,9 @@
 			await addDoc(collection(db, 'tunes'), {
 				name,
 				sessionLink,
-				category: 'irish'
+				category: 'irish',
+				created: serverTimestamp(),
+				modified: serverTimestamp()
 			});
 			goto('/admin');
 		} catch (e) {
