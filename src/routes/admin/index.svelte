@@ -1,24 +1,29 @@
-<script lang="ts">
-	import { db } from '$modules/firebase/firebase';
-	import { collection, getDocs } from 'firebase/firestore';
-	import { onMount } from 'svelte';
-	import type { Tune } from '$types/tune';
-
-	let tunes: Tune[] = [];
-
-	onMount(async () => {
+<script context="module">
+	export async function load({ page }) {
 		const co = collection(db, 'tunes');
 		const snapshots = await getDocs(co);
-		const arr: Tune[] = [];
+		const tunes = [];
 		snapshots.forEach((snapshot) => {
 			const tune = {
 				id: snapshot.id,
 				...snapshot.data()
-			} as Tune;
-			arr.push(tune);
+			};
+			tunes.push(tune);
 		});
-		tunes = arr;
-	});
+		return {
+			props: {
+				tunes
+			}
+		};
+	}
+</script>
+
+<script lang="ts">
+	import { db } from '$modules/firebase/firebase';
+	import { collection, getDocs } from 'firebase/firestore';
+	import type { Tune } from '$types/tune';
+
+	export let tunes: Tune[] = [];
 </script>
 
 <svelte:head>
