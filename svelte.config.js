@@ -26,6 +26,7 @@ const config = {
         alias: {
           $types: path.resolve('./types'),
           $modules: path.resolve('./src/modules'),
+          $model: path.resolve('./src/model'),
         }
       },
       ssr: {
