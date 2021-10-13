@@ -5,7 +5,7 @@
 </script>
 
 <Header />
-<div class="bg-gray-100 body">
+<div class="bg-white body">
 	<slot />
 </div>
 <Footer />

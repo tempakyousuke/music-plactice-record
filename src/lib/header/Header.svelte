@@ -2,7 +2,7 @@
 </script>
 
 <div>
-	<nav class="px-6 py-4 bg-white shadow">
+	<nav class="px-6 py-4 bg-gray-200 shadow">
 		<div class="container flex flex-col mx-auto md:flex-row md:items-center md:justify-between">
 			<div class="flex items-center justify-between">
 				<div>
