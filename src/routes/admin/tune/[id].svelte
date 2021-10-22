@@ -15,14 +15,11 @@
 	import { TuneModelFactory } from '$model/tune';
 	import type { TuneModel, RecordModel } from '$model/tune';
 	import { db, firestorage } from '$modules/firebase/firebase';
-	import { doc, getDoc, getDocs } from 'firebase/firestore';
 	import Button from '$lib/button/Button.svelte';
-	import type { Tune, Record } from '$types/tune';
-	import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+	import { ref, uploadBytes } from 'firebase/storage';
 	import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 	import dayjs from 'dayjs';
 	import { user } from '$modules/store/store';
-	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 	import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 	import { tick } from 'svelte';
@@ -35,7 +32,6 @@
 	let previewUrl;
 	let ext;
 	let uid;
-	let records: Record[] = [];
 	let selected = false;
 	let file;
 
@@ -74,30 +70,12 @@
 			created: serverTimestamp(),
 			modified: serverTimestamp()
 		});
-		getRecords(tuneId);
+		tune = await TuneModelFactory.getDoc(tuneId);
 	};
 
 	user.subscribe((user) => {
 		uid = user.uid;
 	});
-
-	const getRecords = async (id) => {
-		const snapshots = await getDocs(collection(db, 'tunes', id, 'records'));
-		const arr = [];
-		snapshots.forEach(async (snapshot) => {
-			const record = {
-				id: snapshot.id,
-				...snapshot.data()
-			} as Record;
-			arr.push(record);
-		});
-		records = await Promise.all(
-			arr.map(async (val) => {
-				val.src = await getDownloadURL(ref(firestorage, val.path));
-				return val;
-			})
-		);
-	};
 
 	const selectRecord = async (record: RecordModel) => {
 		if (selectedRecord?.id !== record.id) {
@@ -117,10 +95,6 @@
 	const updatePaused = () => {
 		paused = player.paused;
 	};
-
-	onMount(() => {
-		getRecords(tuneId);
-	});
 </script>
 
 <svelte:head>

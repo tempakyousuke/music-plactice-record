@@ -21,7 +21,7 @@
 <script lang="ts">
 	import { db } from '$modules/firebase/firebase';
 	import { collection, getDocs } from 'firebase/firestore';
-	import type { Tune } from '$types/tune';
+	import type { Tune } from '$model/tune';
 
 	export let tunes: Tune[] = [];
 </script>
