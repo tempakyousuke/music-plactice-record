@@ -1,6 +1,6 @@
 import type { Timestamp } from 'firebase/firestore';
 import { db, firestorage } from '$modules/firebase/firebase';
-import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
+import { doc, getDoc, getDocs, updateDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { ref, getDownloadURL } from 'firebase/storage';
 import dayjs from 'dayjs';
 
@@ -26,9 +26,27 @@ export class TuneModel {
 	get createdDatetime(): string {
 		return this.createdDay.format('YYYY-MM-DD HH:mm');
 	}
+
+	update(tune: { name: string; sessionLink: string }): Promise<void> {
+		return updateDoc(doc(db, 'tunes', this.id), {
+			...tune,
+			created: serverTimestamp(),
+			modified: serverTimestamp()
+		});
+	}
 }
 
-export type Tune = Exclude<TuneModel, 'constructor' | 'createdDay' | 'createdDatetime'>;
+export type Tune = Exclude<
+	TuneModel,
+	| 'constructor'
+	| 'createdDay'
+	| 'createdDatetime'
+	| 'update'
+	| 'id'
+	| 'created'
+	| 'modified'
+	| 'records'
+>;
 
 export class RecordModel {
 	id: string;

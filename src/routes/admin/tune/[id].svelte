@@ -23,6 +23,8 @@
 	import Fa from 'svelte-fa';
 	import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 	import { tick } from 'svelte';
+	import Input from '$lib/forms/Input.svelte';
+
 	let player;
 	let paused = true;
 
@@ -34,6 +36,8 @@
 	let uid;
 	let selected = false;
 	let file;
+	let name = tune.name;
+	let sessionLink = tune.sessionLink;
 
 	let selectedRecord: RecordModel | null = null;
 
@@ -92,6 +96,14 @@
 		updatePaused();
 	};
 
+	const updateTune = async () => {
+		await tune.update({
+			name,
+			sessionLink
+		});
+		tune = await TuneModelFactory.getDoc(tuneId);
+	};
+
 	const updatePaused = () => {
 		paused = player.paused;
 	};
@@ -102,7 +114,25 @@
 </svelte:head>
 
 <div class="min-w-md justify-center items-center self-center pt-20">
-	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg mx-auto">
+	<h1 class="text-3xl ml-20">
+		{tune.name}
+		{#if tune.sessionLink}
+			<a
+				class="ml-2 rounded-2xl hover:bg-gray-300 p-2 px-4 bg-gray-200 text-sm"
+				href={tune.sessionLink}
+			>
+				view the session page
+			</a>
+		{/if}
+	</h1>
+	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg ml-20 mt-5">
+		<form>
+			<Input bind:value={name} type="email" label="曲名" className="mt-2" />
+			<Input bind:value={sessionLink} label="the session page" className="mt-2" />
+			<Button block className="mt-5" on:click={updateTune}>更新</Button>
+		</form>
+	</div>
+	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg ml-20 mt-5">
 		<h1>録音追加</h1>
 		<Button
 			on:click={() => {
@@ -125,17 +155,6 @@
 		<Button on:click={upload} disabled={!selected}>アップロード</Button>
 	</div>
 	<div class="max-w-lg ml-20 py-5">
-		<h1 class="text-3xl">
-			{tune.name}
-			{#if tune.sessionLink}
-				<a
-					class="ml-2 rounded-2xl hover:bg-gray-300 p-2 px-4 bg-gray-200 text-sm"
-					href={tune.sessionLink}
-				>
-					view the session page
-				</a>
-			{/if}
-		</h1>
 		<audio
 			class="mt-5 bg-white"
 			bind:this={player}
