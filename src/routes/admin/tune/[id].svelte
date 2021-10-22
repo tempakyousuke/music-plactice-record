@@ -1,16 +1,19 @@
 <script context="module">
 	export async function load({ page }) {
-		const tuneDoc = await getDoc(doc(db, 'tunes', page.params.id));
+		const id = page.params.id;
+		const tune = await TuneModelFactory.getDoc(id);
 		return {
 			props: {
-				tuneId: page.params.id,
-				tune: tuneDoc.data()
+				tuneId: id,
+				tune
 			}
 		};
 	}
 </script>
 
 <script lang="ts">
+	import { TuneModelFactory } from '$model/tune';
+	import type { TuneModel, RecordModel } from '$model/tune';
 	import { db, firestorage } from '$modules/firebase/firebase';
 	import { doc, getDoc, getDocs } from 'firebase/firestore';
 	import Button from '$lib/button/Button.svelte';
@@ -20,8 +23,13 @@
 	import dayjs from 'dayjs';
 	import { user } from '$modules/store/store';
 	import { onMount } from 'svelte';
+	import Fa from 'svelte-fa';
+	import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+	import { tick } from 'svelte';
+	let player;
+	let paused = true;
 
-	export let tune: Tune;
+	export let tune: TuneModel;
 	export let tuneId;
 	let fileinput;
 	let previewUrl;
@@ -30,6 +38,8 @@
 	let records: Record[] = [];
 	let selected = false;
 	let file;
+
+	let selectedRecord: RecordModel | null = null;
 
 	const getExtFromName = (name: string): string => {
 		let index = name.lastIndexOf('.');
@@ -89,6 +99,25 @@
 		);
 	};
 
+	const selectRecord = async (record: RecordModel) => {
+		if (selectedRecord?.id !== record.id) {
+			selectedRecord = record;
+			await tick();
+			player.play();
+		} else {
+			if (player.paused) {
+				player.play();
+			} else {
+				player.pause();
+			}
+		}
+		updatePaused();
+	};
+
+	const updatePaused = () => {
+		paused = player.paused;
+	};
+
 	onMount(() => {
 		getRecords(tuneId);
 	});
@@ -121,15 +150,44 @@
 		</audio>
 		<Button on:click={upload} disabled={!selected}>アップロード</Button>
 	</div>
-	<div class="max-w-lg mx-auto bg-white rounded p-5 mt-10">
-		<h1>録音</h1>
-		{#each records as record (record.id)}
-			<div>
-				<audio controls src={record.src}>
-					Your browser does not support the
-					<code>audio</code> element.
-				</audio>
-			</div>
-		{/each}
+	<div class="max-w-lg ml-20 py-5">
+		<h1 class="text-3xl">
+			{tune.name}
+			{#if tune.sessionLink}
+				<a
+					class="ml-2 rounded-2xl hover:bg-gray-300 p-2 px-4 bg-gray-200 text-sm"
+					href={tune.sessionLink}
+				>
+					view the session page
+				</a>
+			{/if}
+		</h1>
+		<audio
+			class="mt-5 bg-white"
+			bind:this={player}
+			controls
+			src={selectedRecord?.src}
+			on:pause={updatePaused}
+			on:play={updatePaused}
+		>
+			Your browser does not support the
+			<code>audio</code> element.
+		</audio>
 	</div>
+	{#each tune.records as record (record.id)}
+		<div class="cursor-pointer hover:bg-blue-200 py-5" on:click={() => selectRecord(record)}>
+			<div class="mx-20 flex">
+				<div class="rounded-3xl bg-gray-100 w-8 flex justify-center content-center">
+					{#if record.id === selectedRecord?.id && !paused}
+						<Fa icon={faPause} size="2x" scale="0.5" />
+					{:else}
+						<Fa icon={faPlay} size="2x" scale="0.5" />
+					{/if}
+				</div>
+				<div class="ml-3 align-middle leading-loose	">
+					{record.createdDatetime}
+				</div>
+			</div>
+		</div>
+	{/each}
 </div>
