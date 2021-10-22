@@ -15,7 +15,7 @@
 	import { TuneModelFactory } from '$model/tune';
 	import type { TuneModel, RecordModel } from '$model/tune';
 	import Fa from 'svelte-fa';
-	import { faCaretRight, faPause } from '@fortawesome/free-solid-svg-icons';
+	import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 	import { tick } from 'svelte';
 	let player;
 	let paused = true;
@@ -74,7 +74,7 @@
 					{#if record.id === selectedRecord?.id && !paused}
 						<Fa icon={faPause} size="2x" scale="0.5" />
 					{:else}
-						<Fa icon={faCaretRight} pull="right" size="2x" />
+						<Fa icon={faPlay} size="2x" scale="0.5" />
 					{/if}
 				</div>
 				<div class="ml-3 align-middle leading-loose	">
