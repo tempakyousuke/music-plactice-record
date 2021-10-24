@@ -27,10 +27,9 @@ export class TuneModel {
 		return this.createdDay.format('YYYY-MM-DD HH:mm');
 	}
 
-	update(tune: { name: string; sessionLink: string }): Promise<void> {
+	update(tune: { name?: string; sessionLink?: string }): Promise<void> {
 		return updateDoc(doc(db, 'tunes', this.id), {
 			...tune,
-			created: serverTimestamp(),
 			modified: serverTimestamp()
 		});
 	}

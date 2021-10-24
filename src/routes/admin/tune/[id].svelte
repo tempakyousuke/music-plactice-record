@@ -75,6 +75,7 @@
 			modified: serverTimestamp()
 		});
 		tune = await TuneModelFactory.getDoc(tuneId);
+		tune.update({});
 	};
 
 	user.subscribe((user) => {
