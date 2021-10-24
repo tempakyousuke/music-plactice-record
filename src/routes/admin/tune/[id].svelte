@@ -74,9 +74,10 @@
 			created: serverTimestamp(),
 			modified: serverTimestamp()
 		});
-		await addDoc(collection(db, 'dayRecords', dayjs().format('YYYY-MM-DD')), {
+		await addDoc(collection(db, 'dayRecords', dayjs().format('YYYY-MM-DD'), 'records'), {
 			name: tune.name,
 			tuneId: tune.id,
+			uid,
 			recordRef
 		});
 		tune = await TuneModelFactory.getDoc(tuneId);
