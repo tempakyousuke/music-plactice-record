@@ -68,11 +68,16 @@
 		const path = `/${uid}/tunes/${tuneId}/${now}.${ext}`;
 		const upRef = ref(firestorage, `/${uid}/tunes/${tuneId}/${now}.${ext}`);
 		await uploadBytes(upRef, file);
-		await addDoc(collection(db, 'tunes', tuneId, 'records'), {
+		const recordRef = await addDoc(collection(db, 'tunes', tuneId, 'records'), {
 			uid,
 			path,
 			created: serverTimestamp(),
 			modified: serverTimestamp()
+		});
+		await addDoc(collection(db, 'dayRecords', dayjs().format('YYYY-MM-DD')), {
+			name: tune.name,
+			tuneId: tune.id,
+			recordRef
 		});
 		tune = await TuneModelFactory.getDoc(tuneId);
 		tune.update({});
