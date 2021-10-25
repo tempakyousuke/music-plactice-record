@@ -1,6 +1,15 @@
 import type { Timestamp } from 'firebase/firestore';
 import { db, firestorage } from '$modules/firebase/firebase';
-import { doc, getDoc, getDocs, updateDoc, collection, serverTimestamp } from 'firebase/firestore';
+import {
+	doc,
+	getDoc,
+	getDocs,
+	updateDoc,
+	collection,
+	serverTimestamp,
+	deleteDoc
+} from 'firebase/firestore';
+import type { DocumentReference, DocumentData } from 'firebase/firestore';
 import { ref, getDownloadURL } from 'firebase/storage';
 import dayjs from 'dayjs';
 
@@ -49,12 +58,14 @@ export type Tune = Exclude<
 
 export class RecordModel {
 	id: string;
+	tuneId: string;
 	src: string;
 	path: string;
 	created: Timestamp;
 
 	constructor(init: Exclude<RecordModel, 'src'>) {
 		this.id = init.id;
+		this.tuneId = init.tuneId;
 		this.path = init.path;
 		this.created = init.created;
 		getDownloadURL(ref(firestorage, this.path)).then((src) => {
@@ -69,6 +80,14 @@ export class RecordModel {
 	get createdDatetime(): string {
 		return this.createdDay.format('YYYY-MM-DD HH:mm');
 	}
+
+	get docRef(): DocumentReference<DocumentData> {
+		return doc(db, 'tunes', this.tuneId, 'records', this.id);
+	}
+
+	delete(): Promise<void> {
+		return deleteDoc(this.docRef);
+	}
 }
 
 export const TuneModelFactory = {
@@ -82,6 +101,7 @@ export const TuneModelFactory = {
 			snapshots.forEach(async (snapshot) => {
 				const data = {
 					id: snapshot.id,
+					tuneId: id,
 					...snapshot.data()
 				} as Required<RecordModel>;
 				const record = new RecordModel(data);
