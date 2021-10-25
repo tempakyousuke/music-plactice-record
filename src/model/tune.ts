@@ -86,6 +86,7 @@ export class RecordModel {
 	}
 
 	async delete(): Promise<void> {
+		// TODO: remove dayRecord
 		try {
 			const fileRef = ref(firestorage, this.path);
 			await deleteObject(fileRef);

@@ -21,7 +21,7 @@
 	import dayjs from 'dayjs';
 	import { user } from '$modules/store/store';
 	import Fa from 'svelte-fa';
-	import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+	import { faPlay, faPause, faTrash } from '@fortawesome/free-solid-svg-icons';
 	import { tick } from 'svelte';
 	import Input from '$lib/forms/Input.svelte';
 
@@ -114,6 +114,12 @@
 	const updatePaused = () => {
 		paused = player.paused;
 	};
+
+	const deleteRecord = async (event: Event, record: RecordModel) => {
+		event.stopPropagation();
+		await record.delete();
+		tune = await TuneModelFactory.getDoc(tuneId);
+	};
 </script>
 
 <svelte:head>
@@ -184,8 +190,16 @@
 						<Fa icon={faPlay} size="2x" scale="0.5" />
 					{/if}
 				</div>
-				<div class="ml-3 align-middle leading-loose	">
+				<div class="ml-3 align-middle leading-loose min-w-max">
 					{record.createdDatetime}
+				</div>
+				<div class="flex justify-end w-full">
+					<div
+						class="rounded-3xl bg-gray-100 w-8 flex justify-center content-center self-right"
+						on:click={(e) => deleteRecord(e, record)}
+					>
+						<Fa icon={faTrash} size="2x" scale="0.5" />
+					</div>
 				</div>
 			</div>
 		</div>
