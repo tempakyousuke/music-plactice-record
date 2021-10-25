@@ -48,9 +48,10 @@
 </svelte:head>
 
 <div class="min-w-md justify-center items-center self-center pt-10">
-	<div class="max-w-lg ml-3 lg:ml-20 py-5">
-		<h1 class="text-3xl">
+	<div class="max-w-lg ml-3 lg:ml-20 py-5 ">
+		<h1 class="text-3xl whitespace-pre-wrap sm:whitespace-normal">
 			{tune.name}
+			{'\n'}
 			{#if tune.sessionLink}
 				<a
 					class="ml-2 rounded-2xl hover:bg-gray-300 p-2 px-4 bg-gray-200 text-sm"
