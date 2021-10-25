@@ -22,8 +22,10 @@
 	import { db } from '$modules/firebase/firebase';
 	import { collection, getDocs } from 'firebase/firestore';
 	import type { Tune } from '$model/tune';
+	import dayjs from 'dayjs';
 
 	export let tunes: Tune[] = [];
+	const today = dayjs().format('YYYY-MM-DD');
 </script>
 
 <svelte:head>
@@ -36,5 +38,6 @@
 				<a class="hover:text-blue-500" href="/tune/{tune.id}">{tune.name}</a>
 			</div>
 		{/each}
+		<div class="mt-10"><a href="/date/{today}/">本日の録音</a></div>
 	</div>
 </div>
