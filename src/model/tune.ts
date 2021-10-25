@@ -117,6 +117,7 @@ export const TuneModelFactory = {
 		}
 
 		const data = {
+			id,
 			...tune,
 			records: records
 		} as Required<TuneModel>;
