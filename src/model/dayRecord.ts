@@ -16,7 +16,7 @@ export class DayRecordModel {
 	}
 }
 
-const DayRecordModelFactory = {
+export const DayRecordModelFactory = {
 	getRecords: async (date: string): Promise<DayRecordModel[]> => {
 		const snapshots = await getDocs(collection(db, 'dayRecords', date, 'records'));
 		const promises: Promise<DayRecordModel>[] = [];
