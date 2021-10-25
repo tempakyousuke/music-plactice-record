@@ -48,7 +48,7 @@
 </svelte:head>
 
 <div class="min-w-md justify-center items-center self-center pt-10">
-	<div class="max-w-lg ml-20 py-5">
+	<div class="max-w-lg ml-3 lg:ml-20 py-5">
 		<h1 class="text-3xl">
 			{tune.name}
 			{#if tune.sessionLink}

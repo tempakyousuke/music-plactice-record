@@ -127,7 +127,7 @@
 </svelte:head>
 
 <div class="min-w-md justify-center items-center self-center pt-20">
-	<h1 class="text-3xl ml-20">
+	<h1 class="text-3xl ml-3 lg:ml-20">
 		{tune.name}
 		{#if tune.sessionLink}
 			<a
@@ -138,14 +138,18 @@
 			</a>
 		{/if}
 	</h1>
-	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg ml-20 mt-5">
+	<div
+		class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg ml-3 lg:ml-20 mt-5"
+	>
 		<form>
 			<Input bind:value={name} type="email" label="曲名" className="mt-2" />
 			<Input bind:value={sessionLink} label="the session page" className="mt-2" />
 			<Button block className="mt-5" on:click={updateTune}>更新</Button>
 		</form>
 	</div>
-	<div class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg ml-20 mt-5">
+	<div
+		class="flex flex-col px-4 py-6 bg-white rounded-lg shadow-md w-full max-w-lg ml-3 lg:ml-20 mt-5"
+	>
 		<h1>録音追加</h1>
 		<Button
 			on:click={() => {
