@@ -10,7 +10,7 @@ import {
 	deleteDoc
 } from 'firebase/firestore';
 import type { DocumentReference, DocumentData } from 'firebase/firestore';
-import { ref, getDownloadURL } from 'firebase/storage';
+import { ref, getDownloadURL, deleteObject } from 'firebase/storage';
 import dayjs from 'dayjs';
 
 export class TuneModel {
@@ -85,8 +85,14 @@ export class RecordModel {
 		return doc(db, 'tunes', this.tuneId, 'records', this.id);
 	}
 
-	delete(): Promise<void> {
-		return deleteDoc(this.docRef);
+	async delete(): Promise<void> {
+		try {
+			const fileRef = ref(firestorage, this.path);
+			await deleteObject(fileRef);
+			return deleteDoc(this.docRef);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 }
 
