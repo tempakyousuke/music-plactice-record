@@ -1,5 +1,5 @@
 import { db } from '$modules/firebase/firebase';
-import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
+import { getDoc, getDocs, collection } from 'firebase/firestore';
 import { RecordModel } from '$model/tune';
 
 export class DayRecordModel {
@@ -20,14 +20,15 @@ export const DayRecordModelFactory = {
 	getRecords: async (date: string): Promise<DayRecordModel[]> => {
 		const snapshots = await getDocs(collection(db, 'dayRecords', date, 'records'));
 		const promises: Promise<DayRecordModel>[] = [];
-		snapshots.forEach(async (snapshot) => {
+		snapshots.forEach((snapshot) => {
 			const recordPromise = (async () => {
 				const data = snapshot.data();
-				const recordDoc = await getDoc(doc(db, data.recordRef));
+				const recordDoc = await getDoc(data.recordRef);
 				const recordData = {
 					id: recordDoc.id,
-					...recordDoc.data()
+					...(recordDoc.data() as Required<RecordModel>)
 				} as Required<RecordModel>;
+				console.log(recordData);
 				const record = new RecordModel(recordData);
 				const dayRecordData = {
 					id: snapshot.id,
